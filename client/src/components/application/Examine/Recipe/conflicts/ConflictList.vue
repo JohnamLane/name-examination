@@ -220,11 +220,11 @@
     padding: 8px 5px;
     color: black;
   }
-  .synonym-match-title {
+  .synonym-match-title, .phonetic-match-title {
     margin-top: 10px;
   }
 
-  .conflict-synonym-title {
+  .conflict-synonym-title, .conflict-phonetic-title {
     padding: 5px;
     margin-top: 5px;
     text-transform: uppercase;
@@ -268,7 +268,6 @@
   .fa-chevron-up, .fa-chevron-down {
 	  font-size: 12px;
   }
-
 
   /* when selected, highlight synonym matches in blue */
   #conflict-list option.conflict-result:checked {
