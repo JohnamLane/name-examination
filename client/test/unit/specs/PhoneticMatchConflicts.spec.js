@@ -52,12 +52,16 @@ describe('Phonetic-Match Conflicts', () => {
             )
             data.apiSandbox.getStub.withArgs('/api/v1/exact-match?query='+encodeURIComponent('incredible name inc'), sinon.match.any).returns(
                 new Promise((resolve) => resolve({ data: {
-                    names: [],
+                    names: [
+                      { name:'fake exact match', id:'43', source:'moon' }
+                    ],
                 } }))
             )
             data.apiSandbox.getStub.withArgs('/api/v1/requests/synonymbucket/incredible name inc', sinon.match.any).returns(
                 new Promise((resolve) => resolve({ data: {
-                    names:[]
+                    names:[
+                      { name:'fake synonym match - meta1', id:'43', source:'moon' }
+                    ]
                 } }))
             )
             data.apiSandbox.getStub.withArgs('/api/v1/sounds-like?query='+encodeURIComponent('incredible name inc'), sinon.match.any).returns(
@@ -88,15 +92,15 @@ describe('Phonetic-Match Conflicts', () => {
         })
 
         it('displays phonetic-match conflicts last', ()=>{
-            expect(data.vm.$el.querySelector('#conflict-list option:nth-child(1)').textContent.trim()).toEqual('< no exact match >')
-            expect(data.vm.$el.querySelector('#conflict-list option:nth-child(2)').textContent.trim()).toEqual('***')
-            expect(data.vm.$el.querySelector('#conflict-list option:nth-child(3)').textContent.trim()).toEqual('< no synonym match >')
-            expect(data.vm.$el.querySelector('#conflict-list option:nth-child(4)').textContent.trim()).toEqual('***')
-            expect(data.vm.$el.querySelector('#conflict-list option:nth-child(5)').textContent.trim()).toEqual('Incredible Name LTD')
+            var content = data.vm.$el.querySelector('#conflict-list').textContent.trim()
+
+            expect(content.indexOf('fake synonym match')).not.toEqual(-1)
+            expect(content.indexOf('Incredible Name LTD')).not.toEqual(-1)
+            expect(content.indexOf('Incredible Name LTD') > content.indexOf('fake synonym match')).toEqual(true)
         })
 
         it('populates additional attributes as expected', ()=>{
-            expect(data.instance.$store.state.phoneticMatchesConflicts).toEqual([{ text:'Incredible Name LTD', nrNumber:'42', source:'moon' }])
+            expect(data.instance.$store.state.phoneticMatchesConflicts).toEqual([{ class:"conflict-result conflict-phonetic-match", text:'Incredible Name LTD', nrNumber:'42', source:'moon' }])
         })
 
         it('resists no phonetic match', (done)=>{
@@ -113,11 +117,7 @@ describe('Phonetic-Match Conflicts', () => {
                 sessionStorage.setItem('AUTHORIZED', true)
                 router.push('/nameExamination')
                 setTimeout(()=>{
-                    expect(data.vm.$el.querySelector('#conflict-list option:nth-child(1)').textContent.trim()).toEqual('< no exact match >')
-                    expect(data.vm.$el.querySelector('#conflict-list option:nth-child(2)').textContent.trim()).toEqual('***')
-                    expect(data.vm.$el.querySelector('#conflict-list option:nth-child(3)').textContent.trim()).toEqual('< no synonym match >')
-                    expect(data.vm.$el.querySelector('#conflict-list option:nth-child(4)').textContent.trim()).toEqual('***')
-                    expect(data.vm.$el.querySelector('#conflict-list option:nth-child(5)').textContent.trim()).toEqual('< no phonetic match >')
+                    expect(data.vm.$el.querySelector('#conflict-list .conflict-no-match').textContent).toEqual('No Match')
                     done();
                 }, 1000)
             }, 1000)
@@ -140,6 +140,16 @@ describe('Phonetic-Match Conflicts', () => {
         })
 
         it('defaults to green', (done)=>{
+            data.apiSandbox.getStub.withArgs('/api/v1/exact-match?query='+encodeURIComponent('incredible name inc'), sinon.match.any).returns(
+                new Promise((resolve) => resolve({ data: {
+                    names: [],
+                } }))
+            )
+            data.apiSandbox.getStub.withArgs('/api/v1/requests/synonymbucket/incredible name inc', sinon.match.any).returns(
+                new Promise((resolve) => resolve({ data: {
+                    names:[]
+                } }))
+            )
             data.apiSandbox.getStub.withArgs('/api/v1/sounds-like?query='+encodeURIComponent('incredible name inc'), sinon.match.any).returns(
                 new Promise((resolve) => resolve({ data: {
                     names: []
